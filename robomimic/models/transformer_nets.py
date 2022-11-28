@@ -260,7 +260,7 @@ class TRANSFORMER_MIMO_MLP(Module):
         config_d_feedforward_hid = 1024
         config_nlayers = 24
         config_dropout = 0.5
-        config_max_history_len = 500
+        config_max_history_len = 35
 
         self.max_history_len = config_max_history_len
         self.reset_history()
@@ -658,7 +658,7 @@ class TransformerGMMActorNetwork(TransformerActorNetwork):
                 self, obs=obs_dict, goal=goal_dict)
         else:
             outputs = TRANSFORMER_MIMO_MLP.forward_step(
-                self, obs=obs_dict, goal=goal_dict)
+                self, obs_dict=obs_dict, goal_dict=goal_dict)
         
         means = outputs["mean"]
         scales = outputs["scale"]
@@ -726,20 +726,21 @@ class TransformerGMMActorNetwork(TransformerActorNetwork):
         ad = self.forward_train(
             obs_dict, goal_dict, step = True)
 
+        # Not needed because time dimenstion is already squeezed
         # to squeeze time dimension, make another action distribution
-        assert ad.component_distribution.base_dist.loc.shape[1] == 1
-        assert ad.component_distribution.base_dist.scale.shape[1] == 1
-        assert ad.mixture_distribution.logits.shape[1] == 1
-        component_distribution = D.Normal(
-            loc=ad.component_distribution.base_dist.loc.squeeze(1),
-            scale=ad.component_distribution.base_dist.scale.squeeze(1),
-        )
-        component_distribution = D.Independent(component_distribution, 1)
-        mixture_distribution = D.Categorical(logits=ad.mixture_distribution.logits.squeeze(1))
-        ad = D.MixtureSameFamily(
-            mixture_distribution=mixture_distribution,
-            component_distribution=component_distribution,
-        )
+        # assert ad.component_distribution.base_dist.loc.shape[1] == 1
+        # assert ad.component_distribution.base_dist.scale.shape[1] == 1
+        # assert ad.mixture_distribution.logits.shape[1] == 1
+        # component_distribution = D.Normal(
+        #     loc=ad.component_distribution.base_dist.loc.squeeze(1),
+        #     scale=ad.component_distribution.base_dist.scale.squeeze(1),
+        # )
+        # component_distribution = D.Independent(component_distribution, 1)
+        # mixture_distribution = D.Categorical(logits=ad.mixture_distribution.logits.squeeze(1))
+        # ad = D.MixtureSameFamily(
+        #     mixture_distribution=mixture_distribution,
+        #     component_distribution=component_distribution,
+        # )
         return ad
 
     def forward_step(self, obs_dict, goal_dict=None):
@@ -754,7 +755,7 @@ class TransformerGMMActorNetwork(TransformerActorNetwork):
         Returns:
             acts (torch.Tensor): batch of actions - does not contain time dimension
         """
-        out = self.forward_train(obs_dict=obs_dict, goal_dict=goal_dict, step=True)
+        out = self.forward_train_step(obs_dict=obs_dict, goal_dict=goal_dict)
 
         return out.sample()
 

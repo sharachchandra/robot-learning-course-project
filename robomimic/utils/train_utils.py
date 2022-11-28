@@ -518,7 +518,7 @@ def run_epoch(model, data_loader, epoch, validate=False, num_steps=None):
     start_time = time.time()
 
     data_loader_iter = iter(data_loader)
-    for _ in LogUtils.custom_tqdm(range(num_steps)):
+    for idx in LogUtils.custom_tqdm(range(num_steps)):
 
         # load next batch from data loader
         try:
@@ -538,7 +538,7 @@ def run_epoch(model, data_loader, epoch, validate=False, num_steps=None):
 
         # forward and backward pass
         t = time.time()
-        info = model.train_on_batch(input_batch, epoch, validate=validate)
+        info = model.train_on_batch(input_batch, epoch, num_steps=num_steps, idx=idx, validate=validate)
         timing_stats["Train_Batch"].append(time.time() - t)
 
         # tensorboard logging

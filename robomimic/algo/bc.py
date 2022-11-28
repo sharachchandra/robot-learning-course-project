@@ -95,7 +95,7 @@ class BC(PolicyAlgo):
         input_batch["actions"] = batch["actions"][:, 0, :]
         return TensorUtils.to_device(TensorUtils.to_float(input_batch), self.device)
 
-    def train_on_batch(self, batch, epoch, validate=False):
+    def train_on_batch(self, batch, epoch, num_steps=None, idx=None, validate=False):
         """
         Training on a single batch of data.
 
@@ -105,6 +105,11 @@ class BC(PolicyAlgo):
 
             epoch (int): epoch number - required by some Algos that need
                 to perform staged training and early stopping
+            
+            num_steps(int): Number of iterations/ training steps in one epoch 
+                (used by cosine annealing warm restart learning rate scheduler)
+            
+            idx(int): Current index of the iteration of the training loop for an epoch
 
             validate (bool): if True, don't perform any learning updates.
 
@@ -121,7 +126,7 @@ class BC(PolicyAlgo):
             info["losses"] = TensorUtils.detach(losses)
 
             if not validate:
-                step_info = self._train_step(losses)
+                step_info = self._train_step(losses, epoch=epoch, num_steps=num_steps, idx=idx)
                 info.update(step_info)
 
         return info
@@ -173,7 +178,7 @@ class BC(PolicyAlgo):
         losses["action_loss"] = action_loss
         return losses
 
-    def _train_step(self, losses):
+    def _train_step(self, losses, epoch=None, num_steps=None, idx=None):
         """
         Internal helper function for BC algo class. Perform backpropagation on the
         loss tensors in @losses to update networks.
@@ -199,7 +204,8 @@ class BC(PolicyAlgo):
         # per step learning scheduler step
         for k in self.lr_schedulers_per_step:
             if self.lr_schedulers_per_step[k] is not None:
-                self.lr_schedulers_per_step[k].step()
+                assert num_steps > 0
+                self.lr_schedulers_per_step[k].step(epoch + idx /num_steps)
         
         return info
 

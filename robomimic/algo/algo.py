@@ -182,7 +182,7 @@ class Algo(object):
                         for i in range(len(self.nets[k]))
                     ]
                     self.lr_schedulers_per_step[k] = [
-                        TorchUtils.lrwu_scheduler_from_optim_params(net_optim_params=self.optim_params[k], net=self.nets[k][i], optimizer=self.optimizers[k][i])
+                        TorchUtils.lr_per_step_scheduler_from_optim_params(net_optim_params=self.optim_params[k], net=self.nets[k][i], optimizer=self.optimizers[k][i])
                         for i in range(len(self.nets[k]))
                     ]
                 else:
@@ -190,7 +190,7 @@ class Algo(object):
                         net_optim_params=self.optim_params[k], net=self.nets[k])
                     self.lr_schedulers[k] = TorchUtils.lr_scheduler_from_optim_params(
                         net_optim_params=self.optim_params[k], net=self.nets[k], optimizer=self.optimizers[k])
-                    self.lr_schedulers_per_step[k] = TorchUtils.lrwu_scheduler_from_optim_params(
+                    self.lr_schedulers_per_step[k] = TorchUtils.lr_per_step_scheduler_from_optim_params(
                         net_optim_params=self.optim_params[k], net=self.nets[k], optimizer=self.optimizers[k])
 
     def process_batch_for_training(self, batch):

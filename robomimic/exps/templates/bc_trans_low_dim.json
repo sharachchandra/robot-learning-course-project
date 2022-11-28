@@ -1,16 +1,16 @@
 {
     "algo_name": "bc",
     "experiment": {
-        "name": "bc_trans_lift_ph_images",
+        "name": "bc_trans_lift_ph_low_dim",
         "validate": true,
         "logging": {
-            "terminal_output_to_txt": false,
+            "terminal_output_to_txt": true,
             "log_tb": true
         },
         "save": {
             "enabled": true,
             "every_n_seconds": null,
-            "every_n_epochs": 200,
+            "every_n_epochs": 50,
             "epochs": [],
             "on_best_validation": false,
             "on_best_rollout_return": false,
@@ -27,14 +27,14 @@
         "rollout": {
             "enabled": true,
             "n": 50,
-            "horizon": 400,
-            "rate": 200,
+            "horizon": 100,
+            "rate": 50,
             "warmstart": 0,
             "terminate_on_success": true
         }
     },
     "train": {
-        "data": "datasets/lift/ph/image.hdf5",
+        "data": "datasets/lift/ph/low_dim.hdf5",
         "output_dir": "../project/out",
         "num_data_workers": 0,
         "hdf5_cache_mode": "all",
@@ -49,20 +49,21 @@
         ],
         "goal_mode": null,
         "cuda": true,
-        "batch_size": 10,
+        "batch_size": 256,
         "num_epochs": 2000,
-        "seed": 2
+        "seed": 1
     },
     "algo": {
         "optim_params": {
             "policy": {
                 "learning_rate": {
-                    "initial": 0.0004,
+                    "initial": 0.001,
                     "decay_factor": 0.1,
                     "epoch_schedule": [],
                     "warm_up": false,
                     "warm_up_step": 2000,
-                    "decay_power": 0.1
+                    "decay_power": 0.1,
+                    "cosine_annealing_wr": true
                 },
                 "regularization": {
                     "L2": 0.0001

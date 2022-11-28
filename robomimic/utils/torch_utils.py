@@ -229,7 +229,7 @@ class SchedulerLearningRateWarmUp(optim.lr_scheduler._LRScheduler):
                   self._step_count/self.warmup_steps)
         return [lr] * self.num_param_groups
 
-def lrwu_scheduler_from_optim_params(net_optim_params, net, optimizer):
+def lr_per_step_scheduler_from_optim_params(net_optim_params, net, optimizer):
     """
     Helper function to return a LRScheduler from the optim_params 
     section of the config for a particular network. Returns None
@@ -247,10 +247,29 @@ def lrwu_scheduler_from_optim_params(net_optim_params, net, optimizer):
     Returns:
         lr_scheduler (torch.optim.lr_scheduler or None): learning rate scheduler
     """
-    lrwu_scheduler = None
-    if ("warm_up" in net_optim_params["learning_rate"] and net_optim_params["learning_rate"]["warm_up"]):
-        lrwu_scheduler = SchedulerLearningRateWarmUp(optimizer = optimizer, 
-                            max_lr = net_optim_params["learning_rate"]["initial"],
-                            warmup_steps = net_optim_params["learning_rate"]["warm_up_step"],
-                            decay_power= net_optim_params["learning_rate"]["decay_power"])
-    return lrwu_scheduler
+
+    lr_per_step_scheduler = None
+
+    type_warm_up = ("warm_up" in net_optim_params["learning_rate"] and 
+                    net_optim_params["learning_rate"]["warm_up"])
+    type_cosine_annealing_wr = ("cosine_annealing_wr" in net_optim_params["learning_rate"] and 
+                                           net_optim_params["learning_rate"]["cosine_annealing_wr"])
+    assert not type_warm_up and type_cosine_annealing_wr
+    
+    if type_warm_up:
+        lr_per_step_scheduler = SchedulerLearningRateWarmUp(optimizer = optimizer, 
+                                max_lr = net_optim_params["learning_rate"]["initial"],
+                                warmup_steps = net_optim_params["learning_rate"]["warm_up_step"],
+                                decay_power= net_optim_params["learning_rate"]["decay_power"])
+    elif type_cosine_annealing_wr:
+        lr_per_step_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer = optimizer,
+                                                                               
+                                                                               T_0=1,
+                                                                               T_mult=1, 
+                                                                               eta_min=1e-6, 
+                                                                               last_epoch=-1)
+                                                                               
+    return lr_per_step_scheduler
+    
+
+

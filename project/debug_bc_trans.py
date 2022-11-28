@@ -23,7 +23,7 @@ if debug:
     Macros.DEBUG = True
 
 # load config
-config_path = os.path.join(robomimic_path,'exps/templates/bc_trans_images.json')
+config_path = os.path.join(robomimic_path,'exps/templates/bc_trans_low_dim.json')
 config = BaseConfig(json.load(open(config_path)))
 
 # set torch device
