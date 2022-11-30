@@ -258,9 +258,9 @@ class TRANSFORMER_MIMO_MLP(Module):
         "Need to fill these into config"
         config_nhead = 8
         config_d_feedforward_hid = 1024
-        config_nlayers = 24
+        config_nlayers = 6
         config_dropout = 0.5
-        config_max_history_len = 35
+        config_max_history_len = 107
 
         self.max_history_len = config_max_history_len
         self.reset_history()
@@ -356,7 +356,7 @@ class TRANSFORMER_MIMO_MLP(Module):
         
         key_list = list(self.input_obs_group_shapes['obs'].keys())
         # ensure that no extra dimension time is present
-        assert np.all([obs_dict[k].ndim == 2 for k in key_list])
+        # assert np.all([obs_dict[k].ndim == 2 for k in key_list])
         # ensure that the batch size is one
         assert np.all([obs_dict[k].shape[0] == 1 for k in key_list])
 

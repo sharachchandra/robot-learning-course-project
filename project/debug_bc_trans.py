@@ -7,6 +7,7 @@ from robomimic.config.base_config import BaseConfig
 from robomimic.scripts.train import train
 import os
 import json
+import torch
 
 robomimic_path = robomimic.__path__[0]
 
@@ -23,11 +24,11 @@ if debug:
     Macros.DEBUG = True
 
 # load config
-config_path = os.path.join(robomimic_path,'exps/templates/bc_trans_low_dim.json')
+config_path = os.path.join(robomimic_path,'exps/templates/bc_trans_images_transport.json')
 config = BaseConfig(json.load(open(config_path)))
 
 # set torch device
 device = TorchUtils.get_torch_device(try_to_use_cuda=config.train.cuda)
-
+device= torch.device('cuda:1')
 # run training
 train(config, device=device)

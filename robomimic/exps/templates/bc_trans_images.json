@@ -1,7 +1,7 @@
 {
     "algo_name": "bc",
     "experiment": {
-        "name": "bc_trans_lift_ph_images",
+        "name": "bc_trans_square_transport_images",
         "validate": true,
         "logging": {
             "terminal_output_to_txt": true,
@@ -16,8 +16,8 @@
             "on_best_rollout_return": false,
             "on_best_rollout_success_rate": true
         },
-        "epoch_every_n_steps": 500,
-        "validation_epoch_every_n_steps": 50,
+        "epoch_every_n_steps": 100,
+        "validation_epoch_every_n_steps": 10,
         "env": null,
         "additional_envs": null,
         "render": false,
@@ -34,7 +34,7 @@
         }
     },
     "train": {
-        "data": "datasets/lift/ph/image.hdf5",
+        "data": "datasets/transport/ph/image.hdf5",
         "output_dir": "../project/out",
         "num_data_workers": 2,
         "hdf5_cache_mode": "low_dim",
@@ -50,19 +50,20 @@
         "goal_mode": null,
         "cuda": true,
         "batch_size": 16,
-        "num_epochs": 600,
+        "num_epochs": 2000,
         "seed": 2
     },
     "algo": {
         "optim_params": {
             "policy": {
                 "learning_rate": {
-                    "initial": 0.0004,
+                    "initial": 0.001,
                     "decay_factor": 0.1,
                     "epoch_schedule": [],
                     "warm_up": false,
                     "warm_up_step": 2000,
-                    "decay_power": 0.1
+                    "decay_power": 0.1,
+                    "cosine_annealing_wr": true
                 },
                 "regularization": {
                     "L2": 0.0001
@@ -74,7 +75,7 @@
             "l1_weight": 0.0,
             "cos_weight": 0.0
         },
-        "actor_layer_dims": [1024, 1024],
+        "actor_layer_dims": [1024],
         "gaussian": {
             "enabled": false,
             "fixed_std": false,
