@@ -258,9 +258,9 @@ class TRANSFORMER_MIMO_MLP(Module):
         "Need to fill these into config"
         config_nhead = 8
         config_d_feedforward_hid = 1024
-        config_nlayers = 24
+        config_nlayers = 12
         config_dropout = 0.5
-        config_max_history_len = 35
+        config_max_history_len = 36
 
         self.max_history_len = config_max_history_len
         self.reset_history()
@@ -365,6 +365,7 @@ class TRANSFORMER_MIMO_MLP(Module):
             self.history = dict(zip(key_list, [None]*len(key_list)))
             for k in key_list:
                 self.history[k] = torch.unsqueeze(obs_dict[k], dim=1).clone()
+                self.history[k] = self.history[k].repeat(1,self.max_history_len,1)
         else:
             history_len = self.history[key_list[0]].shape[1]
             if history_len < self.max_history_len :

@@ -796,9 +796,11 @@ class BC_Transformer_GMM(BC_Transformer):
         Returns:
             losses (dict): dictionary of losses computed over the batch
         """
-
         # loss is just negative log-likelihood of action targets
-        action_loss = -predictions["log_probs"].mean()
+        if self.algo_config.trans.per_step:
+            action_loss = -predictions["log_probs"].mean()
+        else:
+            action_loss = -predictions["log_probs"][:,-1].mean()
         return OrderedDict(
             log_probs=-action_loss,
             action_loss=action_loss,
